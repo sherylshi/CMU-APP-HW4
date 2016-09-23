@@ -1,16 +1,23 @@
 # README #
 
 To Setup the Environment for the first time:
-* Run <code>npm install</code>
+* Run 
+```
+#!javascript
 
+npm install
+```
 To Run Tests:
-* Run <code>./node_modules/.bin/mocha -u exports tests</code>
+* Run 
+```
+#!javascript
 
+./node_modules/.bin/mocha -u exports tests
+```
 
 ### What is this repository for? ###
 
-* Quick summary
-Code Example for APP Class
+* Quick summary: Code Example for APP Class
 * Version
 0.0.2
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
