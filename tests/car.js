@@ -30,7 +30,6 @@ exports.car_should_create_car = function(done){
   .end(function(err, response){
     console.log(err);
     console.log(response.body);
-    //assert.ok(!err);
     assert.ok(typeof response.body === 'object');
     return done();
   });
