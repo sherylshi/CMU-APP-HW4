@@ -1,14 +1,12 @@
 # README #
 
 To Setup the Environment for the first time:
-* Run 
 ```
 #!javascript
 
 npm install
 ```
 To Run Tests:
-* Run 
 ```
 #!javascript
 
