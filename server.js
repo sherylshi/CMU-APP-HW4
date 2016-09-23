@@ -98,7 +98,7 @@ router.route('/cars/:car_id')
     .patch(function(req, res){
         Car.findById(req.params.car_id, function(err, car){
             if(err){
-                res.send(err);
+                res.status(500).send(err);
             }else{
                 car.license = req.body.license;
                 car.save(function(err){
@@ -121,7 +121,7 @@ router.route('/cars/:car_id')
             _id : req.params.car_id
         }, function(err, car){
             if(err){
-                res.send(err);
+                res.status(500).send(err);
             }else{
                 res.json({"message" : "Car Deleted"});
             }
