@@ -1,5 +1,5 @@
 {
-    "name": "app-uber-api",
+    "name": "app-transport-api",
     "main": "server.js",
     "dependencies": { 
         "express": "~4.14.0",
