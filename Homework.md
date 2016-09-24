@@ -1,5 +1,7 @@
 **Homework due September 29, 2016**
 
+----
+
 **Part 1**
 
 In this part of the exercise, you will identify error codes and error messages that will be part of the response body of your API if there's a problem
@@ -29,7 +31,13 @@ Error Code  | Error Message    | Relevant Resources  | Parameters
  1001  | Invalid resource name {0} given  | All Resources  | `0 - Resource Name`
 1002 | Given car does not exist | `cars` | None
 
+----
 
 **Part 2**
+
+In the second part of the homework, you will implement all the errors listed in the above table into your code.  
+[This link](https://bitbucket.org/appcmusv/transportation-express-api) points to the code you can use to add your code.
+Follow instructions in the README.md file to install this locally and add your code using your favorite editor.
+
 
 
