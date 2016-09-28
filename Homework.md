@@ -39,5 +39,52 @@ In the second part of the homework, you will implement all the errors listed in 
 [This link](https://bitbucket.org/appcmusv/transportation-express-api) points to the code you can use to add your code.
 Follow instructions in the README.md file to install this locally and add your code using your favorite editor.
 
+Below are the fields you should add to the entities. 
+
+_drivers_
+
+- firstName
+- lastName
+- emailAddress
+- password (Used for POST only)
+- addressLine1
+- addressLine2
+- city
+- state
+- zip
+- phoneNumber
+
+_passengers_
+
+- firstName
+- lastName
+- emailAddress
+- password (Used for POST only)
+- addressLine1
+- addressLine2
+- city
+- state
+- zip
+- phoneNumber
+
+_cars_
+
+- make
+- model
+- license
+- doorCount
+
+_paymentAccount_
+
+- accountType
+- accountNumber
+- expirationDate (optional, for passenger accounts only)
+- nameOnAccount
+- bank (optional, for driver accounts only)
+
+
+
+
+
 
 
