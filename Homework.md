@@ -1,4 +1,4 @@
-**Homework due September 29, 2016**
+**Homework due September 02 10AM, 2016**
 
 ----
 
@@ -100,3 +100,17 @@ _paymentAccount_
 - nameOnAccount (String, 18)
 - bank (String, 18) (optional, for driver accounts only)
 
+**Homework due September 06 10AM, 2016**
+
+How to add population actions: http://mongoosejs.com/docs/populate.html using References
+
+Ride and Tests (We will provide the test on Sunday 02).
+
+Your code should comply with the tests provided.
+
+Add the Ride actions
+
+-Rides routes:
+-/rides/:id/routePoints (POST)
+-/rides/:id/routePoints (GET)
+-/rides/:id/routePoint/current (GET)
