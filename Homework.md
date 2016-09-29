@@ -58,16 +58,16 @@ _drivers_
 
 _passengers_
 
-- firstName
-- lastName
-- emailAddress
-- password (Used for POST only)
-- addressLine1
-- addressLine2
-- city
-- state
-- zip
-- phoneNumber
+- firstName (String, 1-15)
+- lastName (String, 1-15)
+- emailAddress (Reegex `/[a-zA-Z0-9_.]+\@[a-zA-Z](([a-zA-Z0-9-]+).)*/` , Required) 
+- password (Used for POST only, String, 8-16, Required - No constraints, Store clear text) 
+- addressLine1 (String, 50)
+- addressLine2 (String, 50)
+- city (String, 50)
+- state (Stringm 2)
+- zip (String, 5)
+- phoneNumber (String, Regex XXX-XXX-XXXX, Required)
 
 _cars_
 
@@ -94,9 +94,9 @@ _ride_
 
 _paymentAccount_
 
-- accountType
-- accountNumber
-- expirationDate (optional, for passenger accounts only)
-- nameOnAccount
-- bank (optional, for driver accounts only)
+- accountType (String, 18)
+- accountNumber (Number, 18)
+- expirationDate (Number, Timestamp)(optional, for passenger accounts only)
+- nameOnAccount (String, 18)
+- bank (String, 18) (optional, for driver accounts only)
 
