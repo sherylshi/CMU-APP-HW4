@@ -30,6 +30,10 @@ app.use('/api', drivers);
 app.use('/api', passengers);
 app.use('/api', paymentAccounts);
 app.use('/api', router);
+
+app.use(function(req, res, next) {
+  res.status(404).json({"errorCode": "1012", "errorMessage" : "Invalid Resource Name", "statusCode" : "404"});  
+});
 /** END: Express Routes Definition */
 
 /** BEGIN: Express Server Start */
