@@ -43,18 +43,18 @@ Below are the fields you should add to the entities.
 
 _drivers_
 
-- firstName
-- lastName
-- emailAddress
-- password (Used for POST only)
-- addressLine1
-- addressLine2
-- city
-- state
-- zip
-- phoneNumber
-- drivingLicense
-- licensedState
+- firstName (String, 1-15)
+- lastName (String, 1-15)
+- emailAddress (Reegex `/[a-zA-Z0-9_.]+\@[a-zA-Z](([a-zA-Z0-9-]+).)*/` , Required) 
+- password (Used for POST only, String, 8-16, Required - No constraints, Store clear text) 
+- addressLine1 (String, 50)
+- addressLine2 (String, 50)
+- city (String, 50)
+- state (Stringm 2)
+- zip (String, 5)
+- phoneNumber (String, Regex XXX-XXX-XXXX, Required)
+- drivingLicense (String, 8-16, Required)
+- licensedState (String, 2, Required)
 
 _passengers_
 
@@ -72,22 +72,22 @@ _passengers_
 _cars_
 
 - driver (reference)
-- make
-- model
-- license
-- doorCount
+- make (String, 18)
+- model (Sring, 18)
+- license (String, 10)
+- doorCount (Number 1-8)
 
 _ride_
 
 - passenger (reference)
 - driver (reference)
 - car (reference)
-- rideType (ECONOMY, PREMIUM, EXECUTIVE)
-- startPoint  (latitude/longitude combination)
-- endPoint (latitude/longitude combination)
-- requestTime
-- pickupTime
-- dropOffTime
+- rideType (String, ECONOMY, PREMIUM, EXECUTIVE)
+- startPoint  Object(lat: Decimal, long: Decimal) (latitude/longitude combination)
+- endPoint Object (lat: Decimal, long: Decimal) (latitude/longitude combination)
+- requestTime (Number, milliseconds since Epoch)
+- pickupTime // sanem 
+- dropOffTime // same
 - status (REQUESTED, AWAITING_DRIVER, DRIVE_ASSIGNED, IN_PROGRESS, ARRIVED, CLOSED )
 - fare
 - route (series of latitude/longitude values)
