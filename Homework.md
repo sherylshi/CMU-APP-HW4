@@ -110,7 +110,7 @@ Your code should comply with the tests provided.
 
 Add the Ride actions
 
--Rides routes:
--/rides/:id/routePoints (POST)
--/rides/:id/routePoints (GET)
--/rides/:id/routePoint/current (GET)
+_Rides routes_
+- /rides/:id/routePoints (POST)
+- /rides/:id/routePoints (GET)
+- /rides/:id/routePoint/current (GET)
