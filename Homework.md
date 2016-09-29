@@ -102,7 +102,7 @@ _paymentAccount_
 
 **Homework due September 06 10AM, 2016**
 
-How to add population actions: http://mongoosejs.com/docs/populate.html using References
+How to add population actions: http://mongoosejs.com/docs/populate.html using References (Not required)
 
 Ride and Tests (We will provide the test on Sunday 02).
 
