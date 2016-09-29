@@ -1,7 +1,7 @@
 /** 
  * Mongoose Schema for the Entity Passenger
  * @author Clark Jeria
- * @version 0.0.2
+ * @version 0.0.3
  */
 
 var mongoose     = require('mongoose');
@@ -19,7 +19,8 @@ var PassengerSchema   = new Schema({
     city: String,
     state: String,
     zip: Number,
-    phoneNumber: Number,
+    phoneNumber: Number,    
+    paymentAccount: { type: Schema.Types.ObjectId, ref: 'PaymentAccount' }
 });
 
 module.exports = mongoose.model('Passenger', PassengerSchema);

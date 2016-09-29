@@ -1,7 +1,7 @@
 /** 
  * Mongoose Schema for the Entity Driver
  * @author Clark Jeria
- * @version 0.0.2
+ * @version 0.0.3
  */
 
 var mongoose     = require('mongoose');
@@ -21,7 +21,7 @@ var DriverSchema   = new Schema({
     state: String,
     zip: Number,
     phoneNumber: Number,
-    car: { type: ObjectId, ref: 'CarSchema' }
+    car: { type: Schema.Types.ObjectId, ref: 'Car' }
 });
 
 module.exports = mongoose.model('Driver', DriverSchema);

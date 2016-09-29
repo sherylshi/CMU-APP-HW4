@@ -1,7 +1,7 @@
 /** 
  * Mongoose Schema for the Entity PaymentAccount
  * @author Clark Jeria
- * @version 0.0.2
+ * @version 0.0.1
  */
 
 var mongoose     = require('mongoose');
