@@ -23,10 +23,12 @@ var router = require('./routes/router');
 var cars = require('./routes/cars');
 var drivers = require('./routes/drivers');
 var passengers = require('./routes/passengers');
+var paymentAccounts = require('./routes/paymentaccounts');
 
 app.use('/api', cars);
 app.use('/api', drivers);
 app.use('/api', passengers);
+app.use('/api', paymentAccounts);
 app.use('/api', router);
 /** END: Express Routes Definition */
 
