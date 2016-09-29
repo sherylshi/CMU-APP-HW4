@@ -53,6 +53,8 @@ _drivers_
 - state
 - zip
 - phoneNumber
+- drivingLicense
+- licensedState
 
 _passengers_
 
