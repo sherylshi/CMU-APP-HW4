@@ -11,7 +11,8 @@ var CarSchema   = new Schema({
     license: String,
     doorCount: Number,
     make: String,
-    model: String
+    model: String,    
+    driver: { type: Schema.Types.ObjectId, ref: 'Driver' }
 });
 
 module.exports = mongoose.model('Car', CarSchema);

@@ -38,18 +38,6 @@ router.route('/cars')
             res.status(422).json({"errorCode": "1002", "errorMessage" : util.format("Missing required parameter %s", "license"), "statusCode" : "422"});
             return;
         }
-        if(typeof req.body.doorCount === 'undefined'){
-            res.status(422).json({"errorCode": "1002", "errorMessage" : util.format("Missing required parameter %s", "doorCount"), "statusCode" : "422"});
-            return;
-        }
-        if(typeof req.body.make === 'undefined'){
-            res.status(422).json({"errorCode": "1002", "errorMessage" : util.format("Missing required parameter %s", "make"), "statusCode" : "422"});
-            return;
-        }
-        if(typeof req.body.model === 'undefined'){
-            res.status(422).json({"errorCode": "1002", "errorMessage" : util.format("Missing required parameter %s", "model"), "statusCode" : "422"});
-            return;
-        }
 
         var car = new Car();
         car.license = req.body.license;
@@ -97,18 +85,6 @@ router.route('/cars/:car_id')
     .patch(function(req, res){
         if(typeof req.body.license === 'undefined'){
             res.status(422).json({"errorCode": "1002", "errorMessage" : util.format("Missing required parameter %s", "license"), "statusCode" : "422"});
-            return;
-        }
-        if(typeof req.body.doorCount === 'undefined'){
-            res.status(422).json({"errorCode": "1002", "errorMessage" : util.format("Missing required parameter %s", "doorCount"), "statusCode" : "422"});
-            return;
-        }
-        if(typeof req.body.make === 'undefined'){
-            res.status(422).json({"errorCode": "1002", "errorMessage" : util.format("Missing required parameter %s", "make"), "statusCode" : "422"});
-            return;
-        }
-        if(typeof req.body.model === 'undefined'){
-            res.status(422).json({"errorCode": "1002", "errorMessage" : util.format("Missing required parameter %s", "model"), "statusCode" : "422"});
             return;
         }
 
