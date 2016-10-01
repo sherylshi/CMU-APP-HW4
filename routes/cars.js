@@ -16,9 +16,15 @@ router.route('/cars')
      * @throws Mongoose Database Error (500 Status Code)
      */
     .get(function(req, res){
+        /**
+         * Add extra error handling rules here
+         */
         Car.find(function(err, cars){
             if(err){
                 res.status(500).send(err);
+                /**
+                 * Wrap this error into a more comprehensive message for the end-user
+                 */
             }else{
                 res.json(cars);
             }
@@ -38,6 +44,9 @@ router.route('/cars')
             res.status(422).json({"errorCode": "1002", "errorMessage" : util.format("Missing required parameter %s", "license"), "statusCode" : "422"});
             return;
         }
+        /**
+         * Add aditional error handling here
+         */
 
         var car = new Car();
         car.license = req.body.license;
@@ -65,6 +74,9 @@ router.route('/cars/:car_id')
      * @throws Mongoose Database Error (500 Status Code)
      */
     .get(function(req, res){
+        /**
+         * Add extra error handling rules here
+         */
         Car.findById(req.params.car_id, function(err, car){
             if(err){
                 res.status(500).send(err);
@@ -83,19 +95,33 @@ router.route('/cars/:car_id')
      * @throws Mongoose Database Error (500 Status Code)
      */
     .patch(function(req, res){
-        if(typeof req.body.license === 'undefined'){
-            res.status(422).json({"errorCode": "1002", "errorMessage" : util.format("Missing required parameter %s", "license"), "statusCode" : "422"});
-            return;
-        }
+        /**
+         * Add extra error handling rules here
+         */
 
         Car.findById(req.params.car_id, function(err, car){
             if(err){
                 res.status(500).send(err);
             }else{
-                car.license = req.body.license;
-                car.doorCount = req.body.doorCount;
-                car.make = req.body.make;
-                car.model = req.body.model;
+                for(var key in req.body) {
+                    if(req.body.hasOwnProperty(key)){
+                        if(key == 'license'){
+                            /**
+                             * Add extra error handling rules here
+                             */
+                            car.license = req.body.license;
+                        }
+                        if(key == 'doorCount'){
+                            /**
+                             * Add extra error handling rules here
+                             */
+                            car.doorCount = req.body.doorCount;
+                        }
+                        /**
+                         * Repeat for the other properties
+                         */
+                    }
+                }
 
                 car.save(function(err){
                     if(err){
@@ -113,6 +139,9 @@ router.route('/cars/:car_id')
      * @throws Mongoose Database Error (500 Status Code)
      */
     .delete(function(req, res){
+        /**
+         * Add extra error handling rules here
+         */
         Car.remove({
             _id : req.params.car_id
         }, function(err, car){
