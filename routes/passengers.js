@@ -21,7 +21,7 @@ function isRequestValid(mKeys,req,res){
             if(schemaKeys.indexOf(element)<0){
                     res.status(400).json({
                     "errorCode": "4002", 
-                    "errorMessage": util.format("Invalid propoerty(ies) %s given for the passenger",element), 
+                    "errorMessage": util.format("Invalid property(ies) %s given for the passenger",element), 
                     "statusCode" : "400"
                 })
                 return 0;
