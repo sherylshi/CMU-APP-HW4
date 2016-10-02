@@ -269,7 +269,7 @@ router.route('/passengers/:passenger_id')
                // res.status(500).send(err);
                res.status(404).json({
                         "errorCode": "1002", 
-                        "errorMessage": util.format("Given paasenger with id '%s' does not exist",req.params.passenger_id), 
+                        "errorMessage": util.format("Given passenger with id '%s' does not exist",req.params.passenger_id), 
                         "statusCode" : "404"
                     })
             }else{

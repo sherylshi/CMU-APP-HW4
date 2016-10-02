@@ -251,7 +251,12 @@ router.route('/paymentaccounts/:paymentaccount_id')
             _id : req.params.paymentaccount_id
         }, function(err, paymentaccount){
             if(err){
-                res.status(500).send(err);
+                //res.status(500).send(err);
+                res.status(404).json({
+                        "errorCode": "1002", 
+                        "errorMessage": util.format("Given payment account with id '%s' does not exist",req.params.passenger_id), 
+                        "statusCode" : "404"
+                    })
             }else{
                 res.json({"message" : "PaymentAccount Deleted"});
             }
