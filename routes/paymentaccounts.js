@@ -116,8 +116,35 @@ router.route('/paymentaccounts')
         paymentAccount.bank = req.body.bank;
 
         paymentAccount.save(function(err){
-            if(err){
-                res.status(500).send(err);
+           if(err){
+                if(Object.keys(err).indexOf('errmsg')>0){
+                    res.status(400).json({
+                        "errorCode": "2005", 
+                        "errorMessage": "Given PaymentAccount already exists, Duplicate key error", 
+                        "details": err.errmsg,
+                        "statusCode" : "400"
+                    })
+                }
+                else if(Object.keys(err).indexOf('errors')>0){
+                    var errorKey = Object.keys(err.errors)[0];
+                    var errorObj = err.errors[errorKey];
+                    if(errorObj.kind == 'required'){
+                        res.status(422).json({
+                            "errorCode": "2004", 
+                            "errorMessage": util.format("Property '%s' is required for the given PaymentAccount", errorKey), 
+                            "statusCode" : "422"
+                        })
+                    }
+                    else if(errorObj.name == 'CastError'){
+                        res.status(400).json({
+                            "errorCode": "2002", 
+                            "errorMessage": util.format("Invalid %s for the given PaymentAccount", errorKey), 
+                            "statusCode" : "400"
+                        })
+                    }
+                }
+                else
+                    res.status(500).send(err);
             }else{
                 res.status(201).json({"message" : "PaymentAccount Created", "paymentAccountCreated" : paymentAccount});
             }
@@ -171,33 +198,39 @@ router.route('/paymentaccounts/:paymentaccount_id')
          * Add aditional error handling here
          */
 
-        PaymentAccount.findById(req.params.paymentaccount_id, function(err, car){
+        PaymentAccount.findById(req.params.paymentaccount_id, function(err, paccount){
             if(err){
                 res.status(500).send(err);
             }else{
                 for(var key in req.body) {
                     if(req.body.hasOwnProperty(key)){
-                        if(key == 'accountType'){
-                            /**
-                             * Add extra error handling rules here
-                             */
-                            paymentAccount.accountType = req.body.accountType;
-                        }
-                        if(key == 'accountNumber'){
-                            /**
-                             * Add extra error handling rules here
-                             */
-                            paymentAccount.accountNumber = req.body.accountNumber;
-                        }
-                        /**
-                         * Repeat for the other properties
-                         */
+                       paccount[key] = req.body[key];
                     }
                 }
 
                 paymentaccount.save(function(err){
                     if(err){
-                        res.status(500).send(err);
+                        //console.log(err);
+                            if(Object.keys(err).indexOf('errors')>0){
+                                var errorKey = Object.keys(err.errors)[0];
+                                var errorObj = err.errors[errorKey];
+                                if(errorObj.kind == 'required'){
+                                    res.status(422).json({
+                                        "errorCode": "2004", 
+                                        "errorMessage": util.format("Property '%s' is required for the given paymentAccount", errorKey), 
+                                        "statusCode" : "422"
+                                    })
+                                }
+                                else if(errorObj.name == 'CastError'){
+                                    res.status(400).json({
+                                        "errorCode": "2002", 
+                                        "errorMessage": util.format("Invalid %s for the given paymentAccount", errorKey), 
+                                        "statusCode" : "400"
+                                    })
+                                }
+                            }
+                            else
+                                res.status(500).send(err);
                     }else{
                         res.json({"message" : "PaymentAccount Updated", "paymentAccountUpdated" : paymentAccount});
                     }

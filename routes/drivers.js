@@ -107,10 +107,6 @@ router.route('/drivers')
      * @throws Mongoose Database Error (500 Status Code)
      */
     .post(function(req, res){
-        if(typeof req.body.firstName === 'undefined'){
-            res.status(422).json({"errorCode": "1002", "errorMessage" : util.format("Missing required parameter %s", "firstName"), "statusCode" : "422"});
-            return;
-        }
         /**
          * Add aditional error handling here
          */
@@ -134,7 +130,34 @@ router.route('/drivers')
 
         driver.save(function(err){
             if(err){
-                res.status(500).send(err);
+                if(Object.keys(err).indexOf('errmsg')>0){
+                    res.status(400).json({
+                        "errorCode": "2005", 
+                        "errorMessage": "Given driver already exists, Duplicate key error", 
+                        "details": err.errmsg,
+                        "statusCode" : "400"
+                    })
+                }
+                else if(Object.keys(err).indexOf('errors')>0){
+                    var errorKey = Object.keys(err.errors)[0];
+                    var errorObj = err.errors[errorKey];
+                    if(errorObj.kind == 'required'){
+                        res.status(422).json({
+                            "errorCode": "2004", 
+                            "errorMessage": util.format("Property '%s' is required for the given driver", errorKey), 
+                            "statusCode" : "422"
+                        })
+                    }
+                    else if(errorObj.name == 'CastError'){
+                        res.status(400).json({
+                            "errorCode": "2002", 
+                            "errorMessage": util.format("Invalid %s for the given driver", errorKey), 
+                            "statusCode" : "400"
+                        })
+                    }
+                }
+                else
+                    res.status(500).send(err);
             }else{
                 res.status(201).json({"message" : "Driver Created", "driverCreated" : driver});
             }
@@ -164,7 +187,9 @@ router.route('/drivers/:driver_id')
                         "statusCode" : "404"
                     })
             }else{
-                res.json(driver);
+                var tempDriver = driver;
+                tempDriver['password'] = null;
+                res.json(tempDriver);
             }
         });  
     })
@@ -190,33 +215,39 @@ router.route('/drivers/:driver_id')
          * Add aditional error handling here
          */
 
-        Driver.findById(req.params.driver_id, function(err, car){
+        Driver.findById(req.params.driver_id, function(err, driver){
             if(err){
                 res.status(500).send(err);
             }else{
                 for(var key in req.body) {
                     if(req.body.hasOwnProperty(key)){
-                        if(key == 'firstName'){
-                            /**
-                             * Add extra error handling rules here
-                             */
-                            driver.firstName = req.body.firstName;
-                        }
-                        if(key == 'lastName'){
-                            /**
-                             * Add extra error handling rules here
-                             */
-                            driver.lastName = req.body.lastName;
-                        }
-                        /**
-                         * Repeat for the other properties
-                         */
+                        driver[key] = req.body[key];
                     }
                 }
 
                 driver.save(function(err){
                     if(err){
-                        res.status(500).send(err);
+                        //console.log(err);
+                            if(Object.keys(err).indexOf('errors')>0){
+                                var errorKey = Object.keys(err.errors)[0];
+                                var errorObj = err.errors[errorKey];
+                                if(errorObj.kind == 'required'){
+                                    res.status(422).json({
+                                        "errorCode": "2004", 
+                                        "errorMessage": util.format("Property '%s' is required for the given driver", errorKey), 
+                                        "statusCode" : "422"
+                                    })
+                                }
+                                else if(errorObj.name == 'CastError'){
+                                    res.status(400).json({
+                                        "errorCode": "2002", 
+                                        "errorMessage": util.format("Invalid %s for the given driver", errorKey), 
+                                        "statusCode" : "400"
+                                    })
+                                }
+                            }
+                            else
+                                res.status(500).send(err);
                     }else{
                         res.json({"message" : "Driver Updated", "driverUpdated" : driver});
                     }
@@ -237,7 +268,11 @@ router.route('/drivers/:driver_id')
             _id : req.params.driver_id
         }, function(err, driver){
             if(err){
-                res.status(500).send(err);
+                res.status(404).json({
+                        "errorCode": "1002", 
+                        "errorMessage": util.format("Given driver with id '%s' does not exist",req.params.driver_id), 
+                        "statusCode" : "404"
+                    })
             }else{
                 res.json({"message" : "Driver Deleted"});
             }

@@ -88,10 +88,6 @@ router.route('/cars')
      * @throws Mongoose Database Error (500 Status Code)
      */
     .post(function(req, res){
-        if(typeof req.body.license === 'undefined'){
-            res.status(422).json({"errorCode": "1002", "errorMessage" : util.format("Missing required parameter %s", "license"), "statusCode" : "422"});
-            return;
-        }
         /**
          * Add aditional error handling here
          */
@@ -162,40 +158,7 @@ router.route('/cars/:car_id')
                         "statusCode" : "404"
                     })
             }else{
-                var queryParam = req.query;
-        
-                if(err){
-                    console.log(err);
-                    res.status(500).send(err);
-                }else{
-                    if(queryParam != 'undefined' || queryParam !=null)
-                    {  
-                        if(isRequestValid(queryParam,req,res)!=1){
-                            return;
-                        }
-
-                        Car.find(queryParam).exec(function(err,carM){
-                            if(carM == undefined){
-                                res.status(400).json({
-                                    "errorCode": "2002", 
-                                    "errorMessage": util.format("Invalid %s format for the given car",Object.keys(queryParam)), 
-                                    "statusCode" : "400"
-                                })
-                                return;
-                            }
-                            if(carM.length < 1)
-                            res.status(404).json({
-                                    "errorCode": "2001", 
-                                    "errorMessage": util.format("Car with attribute %s does not exist",JSON.stringify(queryParam)), 
-                                    "statusCode" : "404"
-                                })
-                            else
-                                res.json(carM);
-                        });
-                    }
-                    else
-                        res.json(cars);
-                }
+                res.json(car);
             }
         });  
     })
