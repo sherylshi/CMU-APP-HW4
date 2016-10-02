@@ -8,6 +8,37 @@ var router = express.Router();
 var util = require('util');
 
 var Passenger = require('../app/models/passenger');
+var Driver = require('../app/models/driver');
+var PaymentAccount = require('../app/models/paymentaccount');
+
+router.route('/passenger/:passenger_id/paymentaccount')
+    .post(function (req, res) {
+        Passenger.findById(req.params.passenger_id, function (err, passenger) {
+            if (err) {
+                res.status(500).send(err);
+                return;
+            }
+            var account = new PaymentAccount(req.body);
+
+            if(!account.expirationDate) {
+                res.status(400).json({
+                    "errorCode": "5006", 
+                    "errorMessage": "passenger requires expirationDate"
+                });
+                return ;
+            }
+            account.passenger_id = req.params.passenger_id;
+            account.save(function (err) {
+                if (err) {
+                    res.status(500).send(err);
+                    return;
+                }
+                res.status(201).json({ "message": "PaymentAccount Created", "paymentAccountCreated": account });
+            });
+        })
+    });
+
+
 
 function isRequestValid(mKeys,req,res){
     var schemaKeys = [];
@@ -20,8 +51,8 @@ function isRequestValid(mKeys,req,res){
             var element = Object.keys(mKeys)[i].toString();
             if(schemaKeys.indexOf(element)<0){
                     res.status(400).json({
-                    "errorCode": "4002", 
-                    "errorMessage": util.format("Invalid property(ies) %s given for the passenger",element), 
+                    "errorCode": "4003", 
+                    "errorMessage": util.format("Invalid property %s for the given passenger",element), 
                     "statusCode" : "400"
                 })
                 return 0;
@@ -132,7 +163,7 @@ router.route('/passengers')
             if(err){
                 if(Object.keys(err).indexOf('errmsg')>0){
                     res.status(400).json({
-                        "errorCode": "2005", 
+                        "errorCode": "4005", 
                         "errorMessage": "Given passenger already exists, Duplicate key error", 
                         "details": err.errmsg,
                         "statusCode" : "400"
@@ -143,14 +174,14 @@ router.route('/passengers')
                     var errorObj = err.errors[errorKey];
                     if(errorObj.kind == 'required'){
                         res.status(422).json({
-                            "errorCode": "2004", 
+                            "errorCode": "4004", 
                             "errorMessage": util.format("Property '%s' is required for the given passenger", errorKey), 
                             "statusCode" : "422"
                         })
                     }
                     else if(errorObj.name == 'CastError'){
                         res.status(400).json({
-                            "errorCode": "2002", 
+                            "errorCode": "4003", 
                             "errorMessage": util.format("Invalid %s for the given passenger", errorKey), 
                             "statusCode" : "400"
                         })
@@ -231,14 +262,14 @@ router.route('/passengers/:passenger_id')
                                 var errorObj = err.errors[errorKey];
                                 if(errorObj.kind == 'required'){
                                     res.status(422).json({
-                                        "errorCode": "2004", 
+                                        "errorCode": "4004", 
                                         "errorMessage": util.format("Property '%s' is required for the given passenger", errorKey), 
                                         "statusCode" : "422"
                                     })
                                 }
                                 else if(errorObj.name == 'CastError'){
                                     res.status(400).json({
-                                        "errorCode": "2002", 
+                                        "errorCode": "4003", 
                                         "errorMessage": util.format("Invalid %s for the given passenger", errorKey), 
                                         "statusCode" : "400"
                                     })

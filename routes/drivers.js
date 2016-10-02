@@ -7,7 +7,36 @@ var express = require('express');
 var router = express.Router();
 var util = require('util');
 
+var Passenger = require('../app/models/passenger');
 var Driver = require('../app/models/driver');
+var PaymentAccount = require('../app/models/paymentaccount');
+
+router.route('/driver/:driver_id/paymentaccount')
+    .post(function (req, res) {
+        Driver.findById(req.params.driver_id, function (err, driver) {
+            if (err) {
+                res.status(500).send(err);
+                return;
+            }
+            var account = new PaymentAccount(req.body);
+
+            if(!account.bank) {
+                res.status(400).json({
+                    "errorCode": "5007", 
+                    "errorMessage":"driver requires bank"
+                });
+                return ;
+            }
+            account.driver_id = req.params.driver_id;
+            account.save(function (err) {
+                if (err) {
+                    res.status(500).send(err);
+                    return;
+                }
+                res.status(201).json({ "message": "PaymentAccount Created", "paymentAccountCreated": account });
+            });
+        })
+    });
 
 function isRequestValid(mKeys,req,res){
     var schemaKeys = [];
@@ -20,8 +49,8 @@ function isRequestValid(mKeys,req,res){
             var element = Object.keys(mKeys)[i].toString();
             if(schemaKeys.indexOf(element)<0){
                     res.status(400).json({
-                    "errorCode": "2002", 
-                    "errorMessage": util.format("Invalid property(ies) %s given for the driver",element), 
+                    "errorCode": "3003", 
+                    "errorMessage": util.format("Invalid property %s for the given driver",element), 
                     "statusCode" : "400"
                 })
                 return 0;
@@ -54,7 +83,7 @@ router.route('/drivers')
                     Driver.find(queryParam).exec(function(err,driverM){
                         if(driverM == undefined){
                              res.status(400).json({
-                                "errorCode": "2002", 
+                                "errorCode": "3002", 
                                 "errorMessage": util.format("Invalid %s format for the given driver",Object.keys(queryParam)), 
                                 "statusCode" : "400"
                             })
@@ -62,7 +91,7 @@ router.route('/drivers')
                         }
                         if(driverM.length < 1)
                            res.status(404).json({
-                             "errorCode": "2001", 
+                             "errorCode": "3003", 
                              "errorMessage": util.format("Driver with attribute %s does not exist",JSON.stringify(queryParam)), 
                              "statusCode" : "404"
                             })
@@ -132,7 +161,7 @@ router.route('/drivers')
             if(err){
                 if(Object.keys(err).indexOf('errmsg')>0){
                     res.status(400).json({
-                        "errorCode": "2005", 
+                        "errorCode": "3005", 
                         "errorMessage": "Given driver already exists, Duplicate key error", 
                         "details": err.errmsg,
                         "statusCode" : "400"
@@ -143,14 +172,14 @@ router.route('/drivers')
                     var errorObj = err.errors[errorKey];
                     if(errorObj.kind == 'required'){
                         res.status(422).json({
-                            "errorCode": "2004", 
+                            "errorCode": "3004", 
                             "errorMessage": util.format("Property '%s' is required for the given driver", errorKey), 
                             "statusCode" : "422"
                         })
                     }
                     else if(errorObj.name == 'CastError'){
                         res.status(400).json({
-                            "errorCode": "2002", 
+                            "errorCode": "3003", 
                             "errorMessage": util.format("Invalid %s for the given driver", errorKey), 
                             "statusCode" : "400"
                         })
@@ -233,14 +262,14 @@ router.route('/drivers/:driver_id')
                                 var errorObj = err.errors[errorKey];
                                 if(errorObj.kind == 'required'){
                                     res.status(422).json({
-                                        "errorCode": "2004", 
+                                        "errorCode": "3004", 
                                         "errorMessage": util.format("Property '%s' is required for the given driver", errorKey), 
                                         "statusCode" : "422"
                                     })
                                 }
                                 else if(errorObj.name == 'CastError'){
                                     res.status(400).json({
-                                        "errorCode": "2002", 
+                                        "errorCode": "3003", 
                                         "errorMessage": util.format("Invalid %s for the given driver", errorKey), 
                                         "statusCode" : "400"
                                     })

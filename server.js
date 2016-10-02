@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 var port = process.env.PORT || 8080;
 
 var mongoose    = require('mongoose');
-mongoose.connect('mongodb://aroshih:laptop12@ds041526.mlab.com:41526/cmu_app');
+mongoose.connect('mongodb://sherylshi:A!234567@ds041536.mlab.com:41536/sherylshi');
 /** END: Express Server Configuration */
 
 /** BEGIN: Express Routes Definition */

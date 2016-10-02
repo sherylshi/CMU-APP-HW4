@@ -20,8 +20,8 @@ function isRequestValid(mKeys,req,res){
             var element = Object.keys(mKeys)[i].toString();
             if(schemaKeys.indexOf(element)<0){
                     res.status(400).json({
-                    "errorCode": "2002", 
-                    "errorMessage": util.format("Invalid property(ies) %s given for the payment account",element), 
+                    "errorCode": "5003", 
+                    "errorMessage": util.format("Invalid property %s given for the given paymentaccount",element), 
                     "statusCode" : "400"
                 })
                 return 0;
@@ -54,7 +54,7 @@ router.route('/paymentaccounts')
                     PaymentAccount.find(queryParam).exec(function(err,PaymentAccountM){
                         if(PaymentAccountM == undefined){
                              res.status(400).json({
-                                "errorCode": "4002", 
+                                "errorCode": "5002", 
                                 "errorMessage": util.format("Invalid %s format for the given PaymentAccount",Object.keys(queryParam)), 
                                 "statusCode" : "400"
                             })
@@ -62,7 +62,7 @@ router.route('/paymentaccounts')
                         }
                         if(PaymentAccountM.length < 1)
                            res.status(404).json({
-                             "errorCode": "4001", 
+                             "errorCode": "5001", 
                              "errorMessage": util.format("PaymentAccount with attribute %s does not exist",JSON.stringify(queryParam)), 
                              "statusCode" : "404"
                             })
@@ -101,7 +101,7 @@ router.route('/paymentaccounts')
      */
     .post(function(req, res){
         if(typeof req.body.accountType === 'undefined'){
-            res.status(422).json({"errorCode": "1002", "errorMessage" : util.format("Missing required parameter %s", "accountType"), "statusCode" : "422"});
+            res.status(422).json({"errorCode": "5004", "errorMessage" : util.format("Property %s is required for the given paymentaccount", "accountType"), "statusCode" : "422"});
             return;
         }
         /**
@@ -119,7 +119,7 @@ router.route('/paymentaccounts')
            if(err){
                 if(Object.keys(err).indexOf('errmsg')>0){
                     res.status(400).json({
-                        "errorCode": "2005", 
+                        "errorCode": "5005", 
                         "errorMessage": "Given PaymentAccount already exists, Duplicate key error", 
                         "details": err.errmsg,
                         "statusCode" : "400"
@@ -130,15 +130,15 @@ router.route('/paymentaccounts')
                     var errorObj = err.errors[errorKey];
                     if(errorObj.kind == 'required'){
                         res.status(422).json({
-                            "errorCode": "2004", 
+                            "errorCode": "5004", 
                             "errorMessage": util.format("Property '%s' is required for the given PaymentAccount", errorKey), 
                             "statusCode" : "422"
                         })
                     }
                     else if(errorObj.name == 'CastError'){
                         res.status(400).json({
-                            "errorCode": "2002", 
-                            "errorMessage": util.format("Invalid %s for the given PaymentAccount", errorKey), 
+                            "errorCode": "5002", 
+                            "errorMessage": util.format("Invalid %s format for the given PaymentAccount", errorKey), 
                             "statusCode" : "400"
                         })
                     }
@@ -169,7 +169,7 @@ router.route('/paymentaccounts/:paymentaccount_id')
             if(err){
                 //res.status(500).send(err);
                  res.status(404).json({
-                        "errorCode": "4001", 
+                        "errorCode": "1002", 
                         "errorMessage": util.format("Given passenger with id '%s' does not exist",req.params.paymentaccount_id), 
                         "statusCode" : "404"
                     });
@@ -216,15 +216,15 @@ router.route('/paymentaccounts/:paymentaccount_id')
                                 var errorObj = err.errors[errorKey];
                                 if(errorObj.kind == 'required'){
                                     res.status(422).json({
-                                        "errorCode": "2004", 
+                                        "errorCode": "5004", 
                                         "errorMessage": util.format("Property '%s' is required for the given paymentAccount", errorKey), 
                                         "statusCode" : "422"
                                     })
                                 }
                                 else if(errorObj.name == 'CastError'){
                                     res.status(400).json({
-                                        "errorCode": "2002", 
-                                        "errorMessage": util.format("Invalid %s for the given paymentAccount", errorKey), 
+                                        "errorCode": "5002", 
+                                        "errorMessage": util.format("Invalid %s format for the given paymentAccount", errorKey), 
                                         "statusCode" : "400"
                                     })
                                 }

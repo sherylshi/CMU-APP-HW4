@@ -21,8 +21,8 @@ function isRequestValid(mKeys,req,res){
             var element = Object.keys(mKeys)[i].toString();
             if(schemaKeys.indexOf(element)<0){
                     res.status(400).json({
-                    "errorCode": "2002", 
-                    "errorMessage": util.format("Invalid property(ies) %s given for the car",element), 
+                    "errorCode": "2003", 
+                    "errorMessage": util.format("Invalid property %s for the given car",element), 
                     "statusCode" : "400"
                 })
                 return 0;
@@ -121,7 +121,7 @@ router.route('/cars')
                     }
                     else if(errorObj.name == 'CastError'){
                         res.status(400).json({
-                            "errorCode": "2002", 
+                            "errorCode": "2003", 
                             "errorMessage": util.format("Invalid %s for the given car", errorKey), 
                             "statusCode" : "400"
                         })
@@ -201,7 +201,7 @@ router.route('/cars/:car_id')
                                 }
                                 else if(errorObj.name == 'CastError'){
                                     res.status(400).json({
-                                        "errorCode": "2002", 
+                                        "errorCode": "2003", 
                                         "errorMessage": util.format("Invalid %s for the given car", errorKey), 
                                         "statusCode" : "400"
                                     })
