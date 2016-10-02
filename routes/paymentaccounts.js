@@ -254,7 +254,7 @@ router.route('/paymentaccounts/:paymentaccount_id')
                 //res.status(500).send(err);
                 res.status(404).json({
                         "errorCode": "1002", 
-                        "errorMessage": util.format("Given payment account with id '%s' does not exist",req.params.passenger_id), 
+                        "errorMessage": util.format("Given payment account with id '%s' does not exist",req.params.paymentaccount_id), 
                         "statusCode" : "404"
                     })
             }else{
