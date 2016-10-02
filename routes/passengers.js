@@ -9,6 +9,27 @@ var util = require('util');
 
 var Passenger = require('../app/models/passenger');
 
+function isRequestValid(mKeys,req,res){
+    var schemaKeys = [];
+    Passenger.schema.eachPath(function(path){
+        if(path!="_id" && path!="__v")
+            schemaKeys.push(path.toString());
+    });
+
+    for (var i = 0, len = Object.keys(mKeys).length; i < len; i++) {
+            var element = Object.keys(mKeys)[i].toString();
+            if(schemaKeys.indexOf(element)<0){
+                    res.status(400).json({
+                    "errorCode": "4002", 
+                    "errorMessage": util.format("Invalid propoerty(ies) %s given for the passenger",element), 
+                    "statusCode" : "400"
+                })
+                return 0;
+            }
+    }
+    return 1;
+}
+
 router.route('/passengers') 
     /**
      * GET call for the passenger entity (multiple).
@@ -19,16 +40,54 @@ router.route('/passengers')
         /**
          * Add extra error handling rules here
          */
-        Passenger.find(function(err, passengers){
+    Passenger.find(function(err, passengers){
+        var queryParam = req.query;
             if(err){
                 res.status(500).send(err);
-                /**
-                 * Wrap this error into a more comprehensive message for the end-user
-                 */
             }else{
-                res.json(passengers);
+                if(queryParam != 'undefined' || queryParam !=null)
+                {  
+                    if(isRequestValid(queryParam,req,res)!=1){
+                        return;
+                    }
+
+                    Passenger.find(queryParam).exec(function(err,passengerM){
+                        if(passengerM == undefined){
+                             res.status(400).json({
+                                "errorCode": "4002", 
+                                "errorMessage": util.format("Invalid %s format for the given passenger",Object.keys(queryParam)), 
+                                "statusCode" : "400"
+                            })
+                            return;
+                        }
+                        if(passengerM.length < 1)
+                           res.status(404).json({
+                             "errorCode": "4001", 
+                             "errorMessage": util.format("Passenger with attribute %s does not exist",JSON.stringify(queryParam)), 
+                             "statusCode" : "404"
+                            })
+                        else{
+                           var fixPassenger = [];
+                            for(var index in passengerM){
+                                var tempPassenger = passengerM[index];
+                                tempPassenger['password'] = null;
+                                fixPassenger.push(tempPassenger);
+                            }
+                            res.json(fixPassenger);
+                        }
+                    });
+                }
+                else{
+                   var fixPassenger = [];
+                    for(var index in passengers){
+                        var tempPassenger = passengers[index];
+                        tempPassenger['password'] = null;
+                        fixPassenger.push(tempPassenger);
+                    }
+                    res.json(fixPassenger);
+                }
             }
-        });
+         });
     })
     /**
      * POST call for the passenger entity.
@@ -94,7 +153,12 @@ router.route('/passengers/:passenger_id')
          */
         Passenger.findById(req.params.passenger_id, function(err, passenger){
             if(err){
-                res.status(500).send(err);
+                //res.status(500).send(err);
+                res.status(404).json({
+                        "errorCode": "4001", 
+                        "errorMessage": util.format("Given passenger with id '%s' does not exist",req.params.passenger_id), 
+                        "statusCode" : "404"
+                    });
             }else{
                 res.json(passenger);
             }

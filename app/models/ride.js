@@ -23,6 +23,31 @@ var RideSchema   = new Schema({
      * - fare (Number)
      * - route (series of latitude/longitude values)
      */
+     passenger:{ type: Schema.Types.ObjectId, ref:'Passenger', required:true},
+     driver:{ type: Schema.Types.ObjectId, ref:'Driver', required:true},
+     car:{ type: Schema.Types.ObjectId,ref:'Car',required:true},
+     rideType:{type: String, enum:['ECONOMY', 'PREMIUM', 'EXECUTIVE'],required:true},
+     startPoint:{
+         lat:{type: Number,required:true},
+         long:{type: Number,required:true},
+     },
+     endPoint:{
+         lat:{type: Number,required:true},
+         long:{type: Number,required:true}
+     },
+     requestTime:{type: Date, default:Date.now, required:true},
+     pickupTime:{type: Date, default:Date.now, required:true},
+     dropOffTime:{type: Date, default:Date.now, required:true},
+     status:{type:String, enum:[
+         'REQUESTED', 
+         'AWAITING_DRIVER', 
+         'DRIVER_ASSIGNED',
+         'IN_PROGRESS',
+         'ARRIVED',
+         'CLOSED'
+         ],required:true},
+    fare:{type:Number, required:true},
+    route:{any:[{}]}
 });
 
 module.exports = mongoose.model('Ride', RideSchema);

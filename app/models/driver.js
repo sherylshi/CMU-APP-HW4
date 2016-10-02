@@ -8,18 +8,18 @@ var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var DriverSchema   = new Schema({
-    firstName: String,
-    lastName: String,
-    emailAddress: String,
-    password: String,
-    addressLine1: String,
-    addressLine2: String,
-    city: String,
-    state: String,
-    zip: String,
-    phoneNumber: String,
-    drivingLicense: String,
-    licensedState: String
+    firstName: {type: String, minlength:1, maxlength:15, required:true},
+    lastName: {type: String, minlength:1, maxlength:15, required:true},
+    emailAddress: {type: String, unique: true, required: true, validate:/[a-zA-Z0-9_.]+\@[a-zA-Z](([a-zA-Z0-9-]+).)*/},
+    password: {type: String, required: true, minlength:8, maxlength:16},
+    addressLine1: {type: String, maxlength:50},
+    addressLine2: {type: String, maxlength:50},
+    city: {type: String, maxlength:50},
+    state: {type: String, maxlength:2},
+    zip: {type: String, maxlength:5},
+    phoneNumber: {type: String, required:true, unique:true,validate:/((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/},
+    drivingLicense: {type: String, unique: true, required: true, minlength:8, maxlength:16},
+    licensedState: {type: String, required: true, maxlength:2},
 });
 
 module.exports = mongoose.model('Driver', DriverSchema);

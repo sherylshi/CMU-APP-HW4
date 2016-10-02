@@ -9,6 +9,27 @@ var util = require('util');
 
 var PaymentAccount = require('../app/models/paymentaccount');
 
+function isRequestValid(mKeys,req,res){
+    var schemaKeys = [];
+    PaymentAccount.schema.eachPath(function(path){
+        if(path!="_id" && path!="__v")
+            schemaKeys.push(path.toString());
+    });
+
+    for (var i = 0, len = Object.keys(mKeys).length; i < len; i++) {
+            var element = Object.keys(mKeys)[i].toString();
+            if(schemaKeys.indexOf(element)<0){
+                    res.status(400).json({
+                    "errorCode": "2002", 
+                    "errorMessage": util.format("Invalid propoerty(ies) %s given for the payment account",element), 
+                    "statusCode" : "400"
+                })
+                return 0;
+            }
+    }
+    return 1;
+}
+
 router.route('/paymentaccounts') 
     /**
      * GET call for the paymentAccount entity (multiple).
@@ -19,16 +40,54 @@ router.route('/paymentaccounts')
         /**
          * Add extra error handling rules here
          */
-        PaymentAccount.find(function(err, paymentAccounts){
+        PaymentAccount.find(function(err, PaymentAccounts){
+        var queryParam = req.query;
             if(err){
                 res.status(500).send(err);
-                /**
-                 * Wrap this error into a more comprehensive message for the end-user
-                 */
             }else{
-                res.json(paymentAccounts);
+                if(queryParam != 'undefined' || queryParam !=null)
+                {  
+                    if(isRequestValid(queryParam,req,res)!=1){
+                        return;
+                    }
+
+                    PaymentAccount.find(queryParam).exec(function(err,PaymentAccountM){
+                        if(PaymentAccountM == undefined){
+                             res.status(400).json({
+                                "errorCode": "4002", 
+                                "errorMessage": util.format("Invalid %s format for the given PaymentAccount",Object.keys(queryParam)), 
+                                "statusCode" : "400"
+                            })
+                            return;
+                        }
+                        if(PaymentAccountM.length < 1)
+                           res.status(404).json({
+                             "errorCode": "4001", 
+                             "errorMessage": util.format("PaymentAccount with attribute %s does not exist",JSON.stringify(queryParam)), 
+                             "statusCode" : "404"
+                            })
+                        else{
+                           var fixPaymentAccount = [];
+                            for(var index in PaymentAccountM){
+                                var tempPaymentAccount = PaymentAccountM[index];
+                                tempPaymentAccount['password'] = null;
+                                fixPaymentAccount.push(tempPaymentAccount);
+                            }
+                            res.json(fixPaymentAccount);
+                        }
+                    });
+                }
+                else{
+                   var fixPaymentAccount = [];
+                    for(var index in PaymentAccounts){
+                        var tempPaymentAccount = PaymentAccounts[index];
+                        tempPaymentAccount['password'] = null;
+                        fixPaymentAccount.push(tempPaymentAccount);
+                    }
+                    res.json(fixPaymentAccount);
+                }
             }
-        });
+         });
     })
     /**
      * POST call for the paymentAccount entity.
@@ -81,7 +140,12 @@ router.route('/paymentaccounts/:paymentaccount_id')
          */
         PaymentAccount.findById(req.params.paymentaccount_id, function(err, paymentAccount){
             if(err){
-                res.status(500).send(err);
+                //res.status(500).send(err);
+                 res.status(404).json({
+                        "errorCode": "4001", 
+                        "errorMessage": util.format("Given passenger with id '%s' does not exist",req.params.paymentaccount_id), 
+                        "statusCode" : "404"
+                    });
             }else{
                 res.json(paymentAccount);
             }

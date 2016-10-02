@@ -8,6 +8,7 @@
 var express    = require('express');
 var app        = express();
 var bodyParser = require('body-parser');
+var util = require('util');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -15,7 +16,7 @@ app.use(bodyParser.json());
 var port = process.env.PORT || 8080;
 
 var mongoose    = require('mongoose');
-mongoose.connect('mongodb://app_user:password@ds035826.mlab.com:35826/cmu_sv_app');
+mongoose.connect('mongodb://aroshih:laptop12@ds041526.mlab.com:41526/cmu_app');
 /** END: Express Server Configuration */
 
 /** BEGIN: Express Routes Definition */
@@ -33,8 +34,13 @@ app.use('/api', paymentAccounts);
 app.use('/api', rides);
 app.use('/api', router);
 
-app.use(function(req, res, next) {
-  res.status(404).json({"errorCode": "1012", "errorMessage" : "Invalid Resource Name", "statusCode" : "404"});  
+app.use("/*/:rname",function(req, res, next) {
+  res.status(404).json(
+    {
+      "errorCode": "1001", 
+      "errorMessage": util.format("Invalid Resource name %s given",req.params.rname), 
+      "statusCode" : "404"
+    });  
 });
 /** END: Express Routes Definition */
 

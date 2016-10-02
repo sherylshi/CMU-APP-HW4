@@ -8,6 +8,28 @@ var router = express.Router();
 var util = require('util');
 
 var Car = require('../app/models/car');
+var mongoose = require('mongoose');
+
+function isRequestValid(mKeys,req,res){
+    var schemaKeys = [];
+    Car.schema.eachPath(function(path){
+        if(path!="_id" && path!="__v")
+            schemaKeys.push(path.toString());
+    });
+
+    for (var i = 0, len = Object.keys(mKeys).length; i < len; i++) {
+            var element = Object.keys(mKeys)[i].toString();
+            if(schemaKeys.indexOf(element)<0){
+                    res.status(400).json({
+                    "errorCode": "2002", 
+                    "errorMessage": util.format("Invalid propoerty(ies) %s given for the car",element), 
+                    "statusCode" : "400"
+                })
+                return 0;
+            }
+    }
+    return 1;
+}
 
 router.route('/cars') 
     /**
@@ -20,13 +42,39 @@ router.route('/cars')
          * Add extra error handling rules here
          */
         Car.find(function(err, cars){
+            var queryParam = req.query;
+        
             if(err){
+                console.log(err);
                 res.status(500).send(err);
-                /**
-                 * Wrap this error into a more comprehensive message for the end-user
-                 */
             }else{
-                res.json(cars);
+                if(queryParam != 'undefined' || queryParam !=null)
+                {  
+                    if(isRequestValid(queryParam,req,res)!=1){
+                        return;
+                    }
+
+                    Car.find(queryParam).exec(function(err,carM){
+                        if(carM == undefined){
+                             res.status(400).json({
+                                "errorCode": "2002", 
+                                "errorMessage": util.format("Invalid %s format for the given car",Object.keys(queryParam)), 
+                                "statusCode" : "400"
+                            })
+                            return;
+                        }
+                        if(carM.length < 1)
+                           res.status(404).json({
+                             "errorCode": "2001", 
+                             "errorMessage": util.format("Car with attribute %s does not exist",JSON.stringify(queryParam)), 
+                             "statusCode" : "404"
+                            })
+                        else
+                            res.json(carM);
+                    });
+                }
+                else
+                    res.json(cars);
             }
         });
     })
@@ -53,6 +101,7 @@ router.route('/cars')
         car.doorCount = req.body.doorCount;
         car.make = req.body.make;
         car.model = req.body.model;
+        car.driver = mongoose.Types.ObjectId(req.body.driver);
 
         car.save(function(err){
             if(err){
@@ -79,7 +128,12 @@ router.route('/cars/:car_id')
          */
         Car.findById(req.params.car_id, function(err, car){
             if(err){
-                res.status(500).send(err);
+                //res.status(500).send(err);
+                res.status(404).json({
+                    "errorCode": "1002", 
+                    "errorMessage": util.format("Given car with id '%s' does not exist",req.params.car_id), 
+                    "statusCode" : "404"
+                    })
             }else{
                 res.json(car);
             }
