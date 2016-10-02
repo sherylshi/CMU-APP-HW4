@@ -43,16 +43,3 @@ Service running on port 8080
 
 ```
 
-### Screenshots
-
-![File1](/screenshots/File1.png)
-![File2](/screenshots/File2.png)
-![File3](/screenshots/File3.png)
-![File4](/screenshots/File4.png)
-![File5](/screenshots/File5.png)
-![File6](/screenshots/File6.png)
-![File7](/screenshots/File7.png)
-![File8](/screenshots/File8.png)
-![File9](/screenshots/File9.png)
-![File10](/screenshots/File10.png)
-![File11](/screenshots/File11.png)
