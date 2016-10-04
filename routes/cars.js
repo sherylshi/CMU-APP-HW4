@@ -133,6 +133,15 @@ router.route('/cars')
                 res.status(201).json({"message" : "Car Created", "carCreated" : car});
             }
         });
+    })
+    .delete(function(req,res){
+            Car.remove({}, function(err, car){
+                if(err){
+                    res.status(500).send(err);
+                }else{
+                    res.json({"message" : "All cars were deleted"});
+                }
+            });
     });
 
 /** 
