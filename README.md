@@ -3,7 +3,6 @@
 Sherrills-MacBook:APPHW4 sherylshi$ ./node_modules/.bin/mocha -u exports tests
 Service running on port 8080
 
-
   ✓ cars_delete_all_car (800ms)
 Mongoose: mpromise (mongoose's default promise library) is deprecated, plug in your own promise library instead: http://mongoosejs.com/docs/promises.html
   ✓ cars01_should_create_car (438ms)
