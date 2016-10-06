@@ -8,19 +8,30 @@ driverOne = {
   firstName: "John",
   lastName: "Smith",
   emailAddress: "test-98989@example.com",
-  password: "anypwd",
+  password: "anypwd88",
   addressLine1: "454 Main Street",
   addressLine2: "",
   city: "Anytown",
   state: "AS",
   zip: "83874",
   phoneNumber: "408-555-2737",
-  drivingLicense: "D162373",
+  drivingLicense: "D1623738",
   licensedState: "CA"
 };
 
 
 var driverOneId;
+
+exports.drivers_delete_all_driver = function(done){
+  supertest(app)
+  .delete('/api/drivers')
+  .expect(200)
+  .end(function(err, response){
+     // console.log(err);
+     // console.log(response.body);
+    return done();
+  });
+};
 
 exports.drivers01_should_create_driver = function(done){
   supertest(app)
@@ -28,8 +39,8 @@ exports.drivers01_should_create_driver = function(done){
   .send(driverOne)
   .expect(201)
   .end(function(err, response){
-//    console.log(err);
-//    console.log(response.body);
+    // console.log(err);
+    // console.log(response.body);
     assert.ok(typeof response.body === 'object');
     driverOneId = response.body._id;
     return done();
@@ -41,8 +52,8 @@ exports.drivers02_should_get_driver = function(done){
       .get('/api/drivers/' + driverOneId)
       .expect(200)
       .end(function(err, response){
-//        console.log(err);
-//        console.log(response.body);
+        // console.log(err);
+        // console.log(response.body);
           assert.ok(response.statusCode == 200);
         assert.ok(typeof response.body === 'object');
         return done();
@@ -57,7 +68,7 @@ exports.drivers03_should_delete_driver = function(done){
       .end(function(err, response){
 //        console.log(err);
 //        console.log(response.body);
-//        assert.ok(typeof response.body === 'object');
+          assert.ok(typeof response.body === 'object');
           assert.ok(response.statusCode == 200);
         return done();
       });

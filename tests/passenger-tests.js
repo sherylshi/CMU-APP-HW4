@@ -8,7 +8,7 @@ passengerOne = {
   firstName: "John",
   lastName: "Smith",
   emailAddress: "test-9876345@example.com",
-  password: "anypwd",
+  password: "anypwd88",
   addressLine1: "454 Main Street",
   addressLine2: "",
   city: "Anytown",
@@ -18,7 +18,19 @@ passengerOne = {
 };
 
 
-var pasesngerOneId;
+
+var passengerOneId;
+
+exports.passenger_delete_all_passenger = function(done){
+  supertest(app)
+  .delete('/api/passengers')
+  .expect(200)
+  .end(function(err, response){
+     // console.log(err);
+     // console.log(response.body);
+    return done();
+  });
+};
 
 exports.passengers01_should_create_passenger = function(done){
   supertest(app)
@@ -29,17 +41,17 @@ exports.passengers01_should_create_passenger = function(done){
 //    console.log(err);
 //    console.log(response.body);
     assert.ok(typeof response.body === 'object');
-      pasesngerOneId = response.body._id;
+      passengerOneId = response.body._id;
     return done();
   });
 };
 
 exports.passengers02_should_get_passenger = function(done){
   supertest(app)
-      .get('/api/passengers/' + pasesngerOneId)
+      .get('/api/passengers/' + passengerOneId)
       .expect(200)
       .end(function(err, response){
-//        console.log(err);
+//       console.log(err);
 //        console.log(response.body);
           assert.ok(response.statusCode == 200);
         assert.ok(typeof response.body === 'object');
@@ -50,7 +62,7 @@ exports.passengers02_should_get_passenger = function(done){
 
 exports.passengers03_should_delete_passenger = function(done){
   supertest(app)
-      .delete('/api/passengers/' + pasesngerOneId)
+      .delete('/api/passengers/' + passengerOneId)
       .expect(200)
       .end(function(err, response){
 //        console.log(err);
@@ -63,7 +75,7 @@ exports.passengers03_should_delete_passenger = function(done){
 
 exports.passengers04_should_not_get_deleted_passenger = function(done){
     supertest(app)
-        .get('/api/passengers/' + pasesngerOneId)
+        .get('/api/passengers/' + passengerOneId)
         .expect(404)
         .end(function(err, response){
 //        console.log(err);

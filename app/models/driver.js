@@ -13,7 +13,7 @@ var DriverSchema   = new Schema({
     emailAddress: {type: String, unique: true, required: true, validate:/[a-zA-Z0-9_.]+\@[a-zA-Z](([a-zA-Z0-9-]+).)*/},
     password: {type: String, required: true, minlength:8, maxlength:16 },
     addressLine1: {type: String, maxlength:50, required:true },
-    addressLine2: {type: String, maxlength:50, required:true },
+    addressLine2: {type: String, maxlength:50 },
     city: {type: String, maxlength:50, required:true },
     state: {type: String, maxlength:2, required:true },
     zip: {type: String, maxlength:5, required:true },

@@ -63,14 +63,18 @@ router.route('/cars')
                             })
                             return;
                         }
-                        if(carM.length < 1)
-                           res.status(404).json({
-                             "errorCode": "2001", 
-                             "errorMessage": util.format("Car with attribute %s does not exist",JSON.stringify(queryParam)), 
-                             "statusCode" : "404"
-                            })
-                        else
+                        if(carM.length < 1){
+                            res.status(404).json({
+                                "errorCode": "2001", 
+                                "errorMessage": util.format("Car with attribute %s does not exist",JSON.stringify(queryParam)), 
+                                "statusCode" : "404"
+                                })
+                            return;
+                        }
+                        else{
+                            console.log(err,carM);
                             res.json(carM);
+                        }
                     });
                 }
                 else
@@ -108,16 +112,18 @@ router.route('/cars')
                         "details": err.errmsg,
                         "statusCode" : "400"
                     })
+                        return;
                 }
                 else if(Object.keys(err).indexOf('errors')>0){
                     var errorKey = Object.keys(err.errors)[0];
                     var errorObj = err.errors[errorKey];
                     if(errorObj.kind == 'required'){
-                        res.status(422).json({
+                        res.status(400).json({
                             "errorCode": "2004", 
                             "errorMessage": util.format("Property '%s' is required for the given car", errorKey), 
-                            "statusCode" : "422"
+                            "statusCode" : "400"
                         })
+                        return;
                     }
                     else if(errorObj.name == 'CastError'){
                         res.status(400).json({
@@ -125,19 +131,45 @@ router.route('/cars')
                             "errorMessage": util.format("Invalid %s for the given car", errorKey), 
                             "statusCode" : "400"
                         })
+                        return;
                     }
+                    else if(errorObj.name == 'ValidatorError'){
+                        res.status(400).json({
+                            "errorCode": "2002", 
+                            "errorMessage": util.format("Validation for property %s for the given car failed", errorKey),
+                            "description": errorObj.message, 
+                            "statusCode" : "400"
+                        })
+                        return;
+                    }
+                    else{
+                        res.status(400).json({
+                            "errorCode": "2002", 
+                            "errorMessage": util.format("Invalid car object"),
+                            "description": errorObj.message, 
+                            "statusCode" : "400"
+                        })
+                        return;
+                   }
                 }
-                else
-                    res.status(500).send(err);
-            }else{
-                res.status(201).json({"message" : "Car Created", "carCreated" : car});
+
+                res.status(500).send(err);
+                return;
             }
+            res.json(car);
         });
     })
+
+
     .delete(function(req,res){
             Car.remove({}, function(err, car){
                 if(err){
-                    res.status(500).send(err);
+                    //res.status(500).send(err);
+                    res.status(404).json({
+                        "errorCode": "1002", 
+                        "errorMessage": "Error deleting cars",
+                        "statusCode" : "404"
+                    })
                 }else{
                     res.json({"message" : "All cars were deleted"});
                 }
@@ -167,7 +199,25 @@ router.route('/cars/:car_id')
                         "statusCode" : "404"
                     })
             }else{
-                res.json(car);
+                if(car == null || car == 'undefined'){
+                    res.status(404).send({
+                        "errorCode": "1002", 
+                        "errorMessage": util.format("Given car does not exist"), 
+                        "statusCode" : "404"
+                    });
+                    return;
+                }
+                else if(Object.keys(car).length<0){
+                    res.status(404).send({
+                        "errorCode": "1002", 
+                        "errorMessage": util.format("Given car does not exist"), 
+                        "statusCode" : "404"
+                    })
+                    return;
+                }
+                else{
+                    res.json(car);
+                }
             }
         });  
     })
@@ -202,11 +252,12 @@ router.route('/cars/:car_id')
                                 var errorKey = Object.keys(err.errors)[0];
                                 var errorObj = err.errors[errorKey];
                                 if(errorObj.kind == 'required'){
-                                    res.status(422).json({
+                                    res.status(400).json({
                                         "errorCode": "2004", 
                                         "errorMessage": util.format("Property '%s' is required for the given car", errorKey), 
-                                        "statusCode" : "422"
-                                    })
+                                        "statusCode" : "400"
+                                    });
+                                    return;
                                 }
                                 else if(errorObj.name == 'CastError'){
                                     res.status(400).json({
@@ -214,6 +265,16 @@ router.route('/cars/:car_id')
                                         "errorMessage": util.format("Invalid %s for the given car", errorKey), 
                                         "statusCode" : "400"
                                     })
+                                    return;
+                                }
+                                else if(errorObj.name == 'ValidatorError'){
+                                     res.status(400).json({
+                                            "errorCode": "2002", 
+                                            "errorMessage": util.format("Validation for propoerty %s for the given car failed", errorKey),
+                                            "description": errorObj.message, 
+                                            "statusCode" : "400"
+                                        })
+                                    return;
                                 }
                             }
                             else

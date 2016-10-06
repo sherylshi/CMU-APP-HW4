@@ -7,36 +7,37 @@ var express = require('express');
 var router = express.Router();
 var util = require('util');
 
-var Passenger = require('../app/models/passenger');
+//var Passenger = require('../app/models/passenger');
 var Driver = require('../app/models/driver');
-var PaymentAccount = require('../app/models/paymentaccount');
+var mongoose = require('mongoose');
+//var PaymentAccount = require('../app/models/paymentaccount');
 
-router.route('/driver/:driver_id/paymentaccount')
-    .post(function (req, res) {
-        Driver.findById(req.params.driver_id, function (err, driver) {
-            if (err) {
-                res.status(500).send(err);
-                return;
-            }
-            var account = new PaymentAccount(req.body);
+// router.route('/driver/:driver_id/paymentaccount')
+//     .post(function (req, res) {
+//         Driver.findById(req.params.driver_id, function (err, driver) {
+//             if (err) {
+//                 res.status(500).send(err);
+//                 return;
+//             }
+//             var account = new PaymentAccount(req.body);
 
-            if(!account.bank) {
-                res.status(400).json({
-                    "errorCode": "5007", 
-                    "errorMessage":"driver requires bank"
-                });
-                return ;
-            }
-            account.driver_id = req.params.driver_id;
-            account.save(function (err) {
-                if (err) {
-                    res.status(500).send(err);
-                    return;
-                }
-                res.status(201).json({ "message": "PaymentAccount Created", "paymentAccountCreated": account });
-            });
-        })
-    });
+//             if(!account.bank) {
+//                 res.status(400).json({
+//                     "errorCode": "5007", 
+//                     "errorMessage":"driver requires bank"
+//                 });
+//                 return ;
+//             }
+//             account.driver_id = req.params.driver_id;
+//             account.save(function (err) {
+//                 if (err) {
+//                     res.status(500).send(err);
+//                     return;
+//                 }
+//                 res.status(201).json({ "message": "PaymentAccount Created", "paymentAccountCreated": account });
+//             });
+//         })
+//     });
 
 function isRequestValid(mKeys,req,res){
     var schemaKeys = [];
@@ -89,14 +90,16 @@ router.route('/drivers')
                             })
                             return;
                         }
-                        if(driverM.length < 1)
+                        if(driverM.length < 1){
                            res.status(404).json({
                              "errorCode": "3003", 
                              "errorMessage": util.format("Driver with attribute %s does not exist",JSON.stringify(queryParam)), 
                              "statusCode" : "404"
                             })
+                        return;
+                        }   
                         else{
-                           var fixDrivers = [];
+                            var fixDrivers = [];
                             for(var index in driverM){
                                 var tempDriver = driverM[index];
                                 tempDriver['password'] = null;
@@ -106,15 +109,15 @@ router.route('/drivers')
                         }
                     });
                 }
-                else{
-                    var fixDrivers = [];
-                    for(var index in drivers){
-                        var tempDriver = drivers[index];
-                        tempDriver['password'] = null;
-                        fixDrivers.push(tempDriver);
+                    else{
+                        var fixDrivers = [];
+                        for(var index in drivers){
+                            var tempDriver = drivers[index];
+                            tempDriver['password'] = null;
+                            fixDrivers.push(tempDriver);
+                        }
+                        res.json(fixDrivers);
                     }
-                    res.json(fixDrivers);
-                }
             }
         });
     })
@@ -166,16 +169,18 @@ router.route('/drivers')
                         "details": err.errmsg,
                         "statusCode" : "400"
                     })
+                    return;
                 }
                 else if(Object.keys(err).indexOf('errors')>0){
                     var errorKey = Object.keys(err.errors)[0];
                     var errorObj = err.errors[errorKey];
                     if(errorObj.kind == 'required'){
-                        res.status(422).json({
+                        res.status(400).json({
                             "errorCode": "3004", 
                             "errorMessage": util.format("Property '%s' is required for the given driver", errorKey), 
-                            "statusCode" : "422"
+                            "statusCode" : "400"
                         })
+                        return;
                     }
                     else if(errorObj.name == 'CastError'){
                         res.status(400).json({
@@ -183,15 +188,51 @@ router.route('/drivers')
                             "errorMessage": util.format("Invalid %s for the given driver", errorKey), 
                             "statusCode" : "400"
                         })
+                        return;
                     }
+
+                    else if(errorObj.name == 'ValidatorError'){
+                        res.status(400).json({
+                            "errorCode": "3002", 
+                            "errorMessage": util.format("Validation for property %s for the given driver failed", errorKey),
+                            "description": errorObj.message, 
+                            "statusCode" : "400"
+                        })
+                        return;
+                    }
+                    else{
+                        res.status(400).json({
+                            "errorCode": "3002", 
+                            "errorMessage": util.format("Invalid driver object"),
+                            "description": errorObj.message, 
+                            "statusCode" : "400"
+                        })
+                        return;
+                   }
                 }
-                else
-                    res.status(500).send(err);
-            }else{
-                res.status(201).json({"message" : "Driver Created", "driverCreated" : driver});
+
+                res.status(500).send(err);
+                return;
             }
+            res.json(driver);
         });
+    })
+
+    .delete(function(req,res){
+            Driver.remove({}, function(err, driver){
+                if(err){
+                    //res.status(500).send(err);
+                    res.status(404).json({
+                        "errorCode": "1002", 
+                        "errorMessage": "Error deleting drivers",
+                        "statusCode" : "404"
+                    })
+                }else{
+                    res.json({"message" : "All drivers were deleted"});
+                }
+            });
     });
+
 
 /** 
  * Express Route: /drivers/:driver_id
@@ -215,13 +256,32 @@ router.route('/drivers/:driver_id')
                         "errorMessage": util.format("Given driver with id '%s' does not exist",req.params.driver_id), 
                         "statusCode" : "404"
                     })
-            }else{
-                var tempDriver = driver;
-                tempDriver['password'] = null;
-                res.json(tempDriver);
-            }
-        });  
-    })
+                }else{
+                    if(driver == null || driver == 'undefined'){
+                        res.status(404).send({
+                            "errorCode": "1002", 
+                            "errorMessage": util.format("Given driver does not exist"), 
+                            "statusCode" : "404"
+                        });
+                        return;
+                    }
+                    else if(Object.keys(driver).length<0){
+                        res.status(404).send({
+                            "errorCode": "1002", 
+                            "errorMessage": util.format("Given driver does not exist"), 
+                            "statusCode" : "404"
+                        })
+                        return;
+                
+                }
+                    else{
+                        var tempDriver = driver;
+                        tempDriver['password'] = null;
+                        res.json(tempDriver);
+                    }
+                }
+            });  
+        })
     /**
      * PATCH call for the driver entity (single).
      * @param {string} firstName - The first name of the new driver
@@ -261,10 +321,10 @@ router.route('/drivers/:driver_id')
                                 var errorKey = Object.keys(err.errors)[0];
                                 var errorObj = err.errors[errorKey];
                                 if(errorObj.kind == 'required'){
-                                    res.status(422).json({
+                                    res.status(400).json({
                                         "errorCode": "3004", 
                                         "errorMessage": util.format("Property '%s' is required for the given driver", errorKey), 
-                                        "statusCode" : "422"
+                                        "statusCode" : "400"
                                     })
                                 }
                                 else if(errorObj.name == 'CastError'){
